@@ -25,6 +25,62 @@ class AuthController extends Controller
     protected int $refreshTokenTtlDays = 7;
 
     /**
+     * Register a new user and return a Sanctum access token + refresh token.
+     *
+     * Expects: { name, email, password, role }
+     * Returns: { token, refresh_token, token_type, expires_in, user: { id, name, email, role } }
+     */
+    public function register(Request $request): JsonResponse
+    {
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'role'     => 'required|in:consumer,producer,merchant',
+        ]);
+
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+            'role'     => $request->role,
+        ]);
+
+        // Create a short-lived Sanctum access token (15 minutes)
+        $accessToken = $user->createToken(
+            'eco-hub-mobile',
+            ['*'],
+            now()->addMinutes($this->accessTokenTtl)
+        )->plainTextToken;
+
+        // Generate a refresh token
+        $plainRefreshToken = Str::random(64);
+        $hashedRefreshToken = hash('sha256', $plainRefreshToken);
+
+        RefreshToken::create([
+            'tokenable_id' => $user->id,
+            'tokenable_type' => User::class,
+            'token' => $hashedRefreshToken,
+            'expires_at' => now()->addDays($this->refreshTokenTtlDays),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        return response()->json([
+            'token' => $accessToken,
+            'refresh_token' => $plainRefreshToken,
+            'token_type' => 'Bearer',
+            'expires_in' => $this->accessTokenTtl * 60,
+            'user'  => [
+                'id'    => $user->id,
+                'name'  => $user->name,
+                'email' => $user->email,
+                'role'  => $user->role,
+            ],
+        ], 201);
+    }
+
+    /**
      * Login and return a Sanctum access token + refresh token.
      *
      * Expects: { email, password }

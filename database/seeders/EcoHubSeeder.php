@@ -21,22 +21,22 @@ class EcoHubSeeder extends Seeder
         // ── Users ──
         $consumer = User::create([
             'name'     => 'Jean Dupont',
-            'email'    => 'jean@ecohub.fr',
-            'password' => Hash::make('password'),
+            'email'    => 'jean.dupont@ecohub.fr',
+            'password' => Hash::make('password123'),
             'role'     => 'consumer',
         ]);
 
         $farmer = User::create([
             'name'     => 'Marc Laurent (Maraîcher)',
             'email'    => 'pro@ecohub.fr',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('password123'),
             'role'     => 'farmer',
         ]);
 
         $merchant = User::create([
             'name'     => 'Sophie Martin (Commerçante)',
             'email'    => 'merchant@ecohub.fr',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('password123'),
             'role'     => 'merchant',
         ]);
 

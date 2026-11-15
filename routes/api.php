@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\HubController;
 use App\Http\Controllers\Api\MerchantController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProducerController;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public endpoints — no auth required
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
 Route::post('/refresh', [AuthController::class, 'refresh']);
 Route::get('/hub/active', [HubController::class, 'active']);
 Route::get('/hubs', [HubController::class, 'index']);
@@ -30,6 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/user/withdrawals', [WithdrawalController::class, 'userWithdrawals']);
+    Route::post('/user/push-token', [NotificationController::class, 'registerPushToken']);
     Route::get('/merchant/dashboard', [MerchantController::class, 'dashboard']);
     Route::post('/merchant/verify-qr', [MerchantController::class, 'verifyQr']);
 });

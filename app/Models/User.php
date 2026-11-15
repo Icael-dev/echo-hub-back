@@ -45,4 +45,12 @@ class User extends Authenticatable
     {
         return $this->morphMany(RefreshToken::class, 'tokenable');
     }
+
+    /**
+     * Get the push tokens for the user.
+     */
+    public function pushTokens(): HasMany
+    {
+        return $this->hasMany(PushToken::class);
+    }
 }
